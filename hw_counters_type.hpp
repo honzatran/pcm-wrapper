@@ -15,21 +15,6 @@ namespace PcmWrapper {
 
 class HwCounter;
 
-namespace detail 
-{
-    static std::mutex counter_mtx;
-
-    struct RegistredCounters 
-    {
-        static std::vector<HwCounter> counters;
-    };
-
-    template <typename T, typename U>
-    struct DecayEquiv : std::is_same<T, typename std::decay_t<U>>::type
-    {};
-}
-
-
 class HwCounter
 {
 public:
@@ -71,21 +56,6 @@ private:
     std::string m_name;
     std::vector<int> m_supportedCpuModels;
 };
-
-
-std::vector<HwCounter> getRegistredHwCounters();
-
-void registerHwCounter(const HwCounter& HwCounter);
-
-template <typename ITERATOR,
-          typename = typename std::enable_if_t<detail::DecayEquiv<
-              HwCounter,
-              typename std::iterator_traits<ITERATOR>::value_type>::value>>
-void
-registerHwCounters(ITERATOR&& begin, ITERATOR&& end) {
-    std::lock_guard<std::mutex> lockGuard(detail::counter_mtx);
-    std::copy(begin, end, std::back_inserter(detail::RegistredCounters::counters));
-}
 
 
 }
