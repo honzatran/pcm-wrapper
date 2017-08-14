@@ -4,13 +4,6 @@
 
 #include <iostream>
 
-#include <range/v3/core.hpp>
-#include <range/v3/back.hpp>
-#include <range/v3/view/transform.hpp>
-#include <range/v3/view/chunk.hpp>
-#include <range/v3/algorithm/for_each_n.hpp>
-#include <range/v3/algorithm/for_each.hpp>
-
 #include <pcm/cpucounters.h>
 
 using namespace PcmWrapper;
@@ -33,11 +26,9 @@ PcmContext::init(HwCounterJsonReader const& reader) {
 
     auto counters = reader.getCounters(m_pcm->getCPUModel());
 
-    m_counters = counters | ranges::view::transform(toCounterPair);
-
-    // for (const auto& counter : counters) {
-    //     m_counters[counter.getIdentifier()] = counter;
-    // }
+    for (const auto& counter : counters) {
+        m_counters[counter.getIdentifier()] = counter;
+    }
 
     m_chosenEvents[0] = "MEM_LOAD_UOPS_RETIRED.L1_MISS";
     m_chosenEvents[1] = "MEM_LOAD_UOPS_RETIRED.L2_MISS";
@@ -102,30 +93,14 @@ CounterRecorder::CounterRecorder(std::size_t operationCount,
     cout << m_eventCounts.size() << endl;
 }
 
-// std::ostream&
-// operator<<(std::ostream& oss, CounterRecorder const& recorder) {
-//     auto& eventCounts = recorder.m_eventCounts;
-//     size_t counterCount = recorder.m_counterCount;
-//
-//     for (size_t i = 0; i < eventCounts.size(); i += counterCount) {
-//         for (size_t counter = 0; counter < counterCount - 1; ++counter) {
-//             oss << eventCounts[i + counter] << c_csvDelim;
-//         }
-//
-//         oss << eventCounts[i + counterCount - 1] << std::endl;
-//     }
-//     return oss;
-// }
-//
 void
 CounterRecorder::print(std::ostream& oss) const {
-    auto rng = m_eventCounts | ranges::view::chunk(m_counterCount);
+    for (size_t i = 0; i < m_eventCounts.size(); i += m_counterCount) {
 
-    ranges::for_each(rng, [&oss, this](auto const& quintet) {
-        ranges::for_each_n(quintet, m_counterCount - 1, [&oss](auto const& v) {
-            oss << v << ',';
-        });
+        for (size_t counter = 0; counter < m_counterCount - 1; ++counter) {
+            oss << m_eventCounts[i + counter] << c_csvDelim;
+        }
 
-        oss << ranges::back(quintet) << endl;
-    });
+        oss << m_eventCounts[i + m_counterCount - 1] << std::endl;
+    }
 }
