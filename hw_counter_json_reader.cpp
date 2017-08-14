@@ -1,6 +1,6 @@
 #include "hw_counter_json_reader.hpp"
 
-#include "hw_counters_type.hpp"
+#include "hw_counter.hpp"
 
 #include <fstream>
 #include <iostream>

@@ -17,12 +17,12 @@ include_directories(${PCM_INCLUDE_DIRS} ${JSON_INCLUDE_DIRS} ${RANGE_V3_INCLUDE_
  
 
 
-add_library(${EXEC} SHARED "hw_counters_type.cpp" "hw_counter_json_reader.cpp" "pcm_context.cpp")
+add_library(${EXEC} SHARED "hw_counter_json_reader.cpp" "pcm_context.cpp")
 target_link_libraries(${EXEC} PRIVATE ${PCM_LIBRARIES})
 add_definitions(${PCM_DEFINITIONS} ${JSON_DEFINITIONS} ${RANGE_V3_DEFINITIONS})
 
 install(TARGETS ${EXEC} DESTINATION "lib")
-install(FILES "pcm_context.hpp" "hw_counters_type.hpp" "hw_counter_json_reader.hpp"  DESTINATION "include")
+install(FILES "pcm_context.hpp" "hw_counter.hpp" "hw_counter_json_reader.hpp"  DESTINATION "include")
 
 
 install(DIRECTORY ${JSON_INCLUDE_DIRS} DESTINATION ".")

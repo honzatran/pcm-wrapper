@@ -4,7 +4,7 @@
 
 #include <json/json.hpp>
 
-#include "hw_counters_type.hpp"
+#include "hw_counter.hpp"
 #include <unordered_map>
 
 namespace PcmWrapper {

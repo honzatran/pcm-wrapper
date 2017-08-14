@@ -2,7 +2,7 @@
 #define PCM_CONTEXT_HPP
 
 #include "hw_counter_json_reader.hpp"
-#include "hw_counters_type.hpp"
+#include "hw_counter.hpp"
 
 #include <array>
 #include <unordered_map>
