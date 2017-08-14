@@ -9,10 +9,6 @@
 
 #include <json/json.hpp>
 
-#include <range/v3/core.hpp>
-#include <range/v3/view/map.hpp>
-#include <range/v3/view/filter.hpp>
-
 #include <dirent.h>
 #include <unordered_map>
 
@@ -55,7 +51,7 @@ HwCounterJsonReader::loadCounters(std::string const& filePath, int cpuModel) {
 
     inputStream >> j;
 
-    for (const auto& element : j) {
+    for (auto const& element : j) {
         HwCounter counter = convert(element);
 
         auto counterIt = m_hwCounters.find(counter.getIdentifier());
@@ -80,7 +76,7 @@ processFile(string const& directory, dirent* const ent, F&& f) {
 }
 
 
-int getCPUModel(const std::string filename) {
+int getCPUModel(std::string const& filename) {
     int pos = filename.find('_');
 
     if (pos == string::npos) {
@@ -138,23 +134,17 @@ HwCounterJsonReader::convert(nlohmann::json const& serializedCounter) {
 
 std::vector<HwCounter>
 HwCounterJsonReader::getCounters(int cpuModel) const {
-    return m_hwCounters 
-        | ranges::view::values 
-        | ranges::view::filter([cpuModel](HwCounter const& counter) {
-               return counter.supports(cpuModel);
-           });
+    std::vector<HwCounter> counters;
+    for (const auto& p : m_hwCounters) {
+        auto& cpumodels = p.second.getSupportedModels();
 
-    // std::vector<HwCounter> counters;
-    // for (const auto& p : m_hwCounters) {
-    //     auto& cpumodels = p.second.getSupportedModels();
-    //
-    //     bool supports = p.second.supports(cpuModel);
-    //
-    //     if (supports) {
-    //         counters.push_back(p.second);
-    //     }
-    // }
-    // return counters;
+        bool supports = p.second.supports(cpuModel);
+
+        if (supports) {
+            counters.push_back(p.second);
+        }
+    }
+    return counters;
 }
 
 
