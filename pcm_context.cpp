@@ -10,7 +10,8 @@ using namespace PcmWrapper;
 using namespace std;
 
 
-auto toCounterPair(HwCounter const& counter) {
+std::pair<std::string, HwCounter>
+toCounterPair(HwCounter const& counter) {
     return std::make_pair(counter.getIdentifier(), counter);
 }
 
