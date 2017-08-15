@@ -4,7 +4,6 @@ cmake_minimum_required(VERSION 3.0.2)
 
 set(PCM_WRAPPER "pcm-wrapper")
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/pcm/cmake)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/cmake)
 
 find_package(PCM REQUIRED)
