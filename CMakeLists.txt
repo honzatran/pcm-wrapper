@@ -26,3 +26,6 @@ install(DIRECTORY ${JSON_INCLUDE_DIRS} DESTINATION ".")
 install(DIRECTORY ${PCM_INCLUDE_DIRS} DESTINATION ".")
 install(FILES ${PCM_LIBRARIES} DESTINATION "lib")
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/FindPCMWrapper.cmake DESTINATION "cmake")
+
+add_executable(main main.cpp)
+target_link_libraries(main ${EXEC} ${PCM_LIBRARIES})

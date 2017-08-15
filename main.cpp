@@ -6,7 +6,7 @@
 #include <pcm/cpucounters.h>
 #include <pcm/utils.h>
 
-#include "hw_counters_type.hpp"
+#include "hw_counter.hpp"
 #include "hw_counter_json_reader.hpp"
 #include "pcm_context.hpp"
 
