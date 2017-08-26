@@ -1,10 +1,11 @@
 #include "hw_counter_json_reader.hpp"
 
+#include "error_handling.hpp"
 #include "hw_counter.hpp"
 
+#include <cstdint>
 #include <fstream>
 #include <iostream>
-#include <cstdint>
 #include <string>
 
 #include <json/json.hpp>
@@ -20,7 +21,7 @@ using namespace PcmWrapper;
 
 constexpr char c_EventName[] = "EventName";
 constexpr char c_EventCode[] = "EventCode";
-constexpr char c_UMask[] = "UMask";
+constexpr char c_UMask[]     = "UMask";
 
 const std::unordered_map<string, PCM::SupportedCPUModels> c_cpuModels = {
     {"broadwell", PCM::BROADWELL},
@@ -34,7 +35,7 @@ const std::unordered_map<string, PCM::SupportedCPUModels> c_cpuModels = {
 };
 
 bool
-isFile(dirent *const ent) {
+isFile(dirent* const ent) {
     return ent->d_type == DT_REG;
 }
 
@@ -46,6 +47,11 @@ isJson(string const& filename) {
 void
 HwCounterJsonReader::loadCounters(std::string const& filePath, int cpuModel) {
     std::ifstream inputStream(filePath);
+
+    if (!inputStream.is_open()) {
+        std::string s = "Could not open file " + filePath;
+        FATAL_ERROR(s.c_str());
+    }
 
     json j;
 
@@ -75,8 +81,8 @@ processFile(string const& directory, dirent* const ent, F&& f) {
     }
 }
 
-
-int getCPUModel(std::string const& filename) {
+int
+getCPUModel(std::string const& filename) {
     int pos = filename.find('_');
 
     if (pos == string::npos) {
@@ -92,11 +98,10 @@ int getCPUModel(std::string const& filename) {
     }
 }
 
-
-void 
+void
 HwCounterJsonReader::loadFromDirectory(std::string const& directory) {
-    DIR *dir;
-    dirent *ent;
+    DIR* dir;
+    dirent* ent;
 
     // use lambda and functor to avoid exposing libc api
     auto loadCounterFunctor = [this, &directory](std::string const& filename) {
@@ -117,7 +122,6 @@ HwCounterJsonReader::loadFromDirectory(std::string const& directory) {
 
         closedir(dir);
     }
-
 }
 
 HwCounter
@@ -146,9 +150,4 @@ HwCounterJsonReader::getCounters(int cpuModel) const {
     }
     return counters;
 }
-
-
-
-
-
 

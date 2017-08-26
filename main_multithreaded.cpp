@@ -1,7 +1,7 @@
-#include <iostream> 
 #include <vector>
 #include <random>
 #include <chrono>
+#include <thread>
 
 #include <pcm/cpucounters.h>
 #include <pcm/utils.h>
@@ -10,46 +10,36 @@
 #include "hw_counter_json_reader.hpp"
 #include "pcm_context.hpp"
 
+#include <mutex>
+
+std::mutex mtx;
 
 
 using namespace std;
+using namespace PcmWrapper;
 
 #define SIZE 1024 * 1024 * 512 
 #define MAX 1024
 
-int
-main(int argc, char** argv) {
+void
+work(PcmContext const& context, int core) {
     std::mt19937 gen;
     uniform_int_distribution<int> dist(0, MAX);
 
     uniform_int_distribution<int> index_dist(1, SIZE);
 
-    PcmWrapper::HwCounterJsonReader reader;
-
-    reader.loadFromDirectory(argv[1]);
-
-    PcmWrapper::PcmContext context;
-    context.init(reader);
-    context.resetMsrIfBusy();
-
-    context.startMonitoring();
-
-    auto handle = context.getCoreHandle(2);
+    auto handle = context.getCoreHandle(core);
 
     auto mixin =
         PcmWrapper::CounterHandleRecorder<std::decay<decltype(handle)>::type>(
             2, PcmWrapper::FOUR, std::move(handle));
 
-    set_signal_handlers();
-
     std::vector<int> values;
     values.reserve(SIZE);
 
-    cout << "FILL START" << endl;
     for (std::size_t i = 0; i < SIZE; i++) {
         values.push_back(dist(gen));
     }
-    cout << "FILL END" << endl;
 
     int sum = 0;
 
@@ -65,16 +55,45 @@ main(int argc, char** argv) {
         indices.push_back(dist(gen));
     }
 
-    cout  << "RANDOM" << endl;
-
     mixin.onStart();
     for (std::size_t i = 0; i < 100; i++) {
         sum += values[indices[i]];
     }
     mixin.onEnd();
 
-    cout << context.getEventHeader() << endl;
-    cout << mixin << endl;
+    {
+        std::lock_guard<std::mutex> lock_guard(mutex);
+
+        cout << "core: " << core << endl;
+        cout << context.getEventHeader() << endl;
+        cout << mixin << endl;
+    }
+}
+
+int
+main(int argc, char** argv) {
+
+    PcmWrapper::HwCounterJsonReader reader;
+
+    reader.loadFromDirectory(argv[1]);
+
+    PcmWrapper::PcmContext context;
+    context.init(reader);
+    context.resetMsrIfBusy();
+
+    context.startMonitoring();
+
+    set_signal_handlers();
+
+    std::vector<std::thread> workers;
+
+    for (size_t i = 0; i < 4; ++i) {
+        workers.push_back(std::thread([i, &context] { work(context, i); }));
+    }
+
+    for (auto & t : workers) {
+        t.join();
+    }
 
     exit_cleanup();
 

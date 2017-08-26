@@ -64,8 +64,13 @@ public:
     void onBenchmarkStart();
     void onBenchmarkEnd();
 
+    void resetMsrIfBusy() {
+        m_resetBusyDevice = true;
+    }
+
     template <CounterRegister order>
     void setCounter(std::string const& eventName) {
+        checkEventValidity(eventName);
         m_chosenEvents[order] = eventName;
     }
 
@@ -85,8 +90,13 @@ private:
     PCM* m_pcm;
     std::unordered_map<std::string, HwCounter> m_counters;
     std::array<std::string, 4> m_chosenEvents;
+    bool m_resetBusyDevice = false;
 
     const HwCounter& getHwCounter(std::string const& eventName) const;
+
+    void handlePcmProgramError(PCM::ErrorCode ec);
+
+    void checkEventValidity(std::string const& eventName);
 };
 
 class CoreCountersHandle : public detail::CounterState<CoreCounterState>
@@ -127,8 +137,6 @@ public:
         storeCounterDifference<COUNTER_STATE, CounterRegister::FOUR>(state);
 
         m_index += m_counterCount;
-
-        std::cout << m_index << std::endl;
     }
 
     friend std::ostream& operator<<(std::ostream& oss,

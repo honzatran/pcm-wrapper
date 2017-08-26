@@ -12,12 +12,12 @@ find_package(JSON REQUIRED)
 message(${PCM_INCLUDE_DIRS})
 include_directories(${PCM_INCLUDE_DIRS} ${JSON_INCLUDE_DIRS})
  
-add_library(${PCM_WRAPPER} SHARED "hw_counter_json_reader.cpp" "pcm_context.cpp")
+add_library(${PCM_WRAPPER} SHARED "hw_counter_json_reader.cpp" "pcm_context.cpp" "error_handling.cpp")
 target_link_libraries(${PCM_WRAPPER} PRIVATE ${PCM_LIBRARIES})
 add_definitions(${PCM_DEFINITIONS} ${JSON_DEFINITIONS})
 
 install(TARGETS ${PCM_WRAPPER} DESTINATION "lib")
-install(FILES "pcm_context.hpp" "hw_counter.hpp" "hw_counter_json_reader.hpp"  DESTINATION "include")
+install(FILES "pcm_context.hpp" "hw_counter.hpp" "hw_counter_json_reader.hpp" "error_handling.hpp" DESTINATION "include")
 
 install(DIRECTORY ${JSON_INCLUDE_DIRS} DESTINATION ".")
 install(DIRECTORY ${PCM_INCLUDE_DIRS} DESTINATION ".")
@@ -26,3 +26,6 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/FindPCMWrapper.cmake DESTINATION "cmak
 
 add_executable(main main.cpp)
 target_link_libraries(main ${PCM_WRAPPER} ${PCM_LIBRARIES})
+
+add_executable(multithread main_multithreaded.cpp)
+target_link_libraries(multithread ${PCM_WRAPPER} ${PCM_LIBRARIES})
