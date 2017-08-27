@@ -25,7 +25,13 @@ install(FILES ${PCM_LIBRARIES} DESTINATION "lib")
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/FindPCMWrapper.cmake DESTINATION "cmake")
 
 add_executable(main main.cpp)
+
 target_link_libraries(main ${PCM_WRAPPER} ${PCM_LIBRARIES})
 
 add_executable(multithread main_multithreaded.cpp)
 target_link_libraries(multithread ${PCM_WRAPPER} ${PCM_LIBRARIES})
+
+if (UNIX)
+    target_link_libraries(multithread pthread)
+    target_link_libraries(main pthread)
+endif(UNIX)
