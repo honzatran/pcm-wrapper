@@ -3,6 +3,7 @@
 
 #include "hw_counter_json_reader.hpp"
 #include "hw_counter.hpp"
+#include "error_handling.hpp"
 
 #include <array>
 #include <unordered_map>
@@ -153,9 +154,14 @@ private:
     template <typename COUNTER_STATE, CounterRegister COUNTER_REGISTER>
     void storeCounterDifference(COUNTER_STATE const& state) {
         if (COUNTER_REGISTER < m_counterCount) {
-            m_eventCounts[m_index + COUNTER_REGISTER] =
-                state.template getEventCounts<COUNTER_REGISTER>();
-        }
+            if (m_index + COUNTER_REGISTER < m_eventCounts.size()) {
+                m_eventCounts[m_index + COUNTER_REGISTER] =
+                    state.template getEventCounts<COUNTER_REGISTER>();
+            } else {
+                FATAL_ERROR(
+                    "Storing event count outside the eventCount structure");
+            }
+        } 
     }
 
     void print(std::ostream& oss) const;
