@@ -131,16 +131,41 @@ CounterRecorder::CounterRecorder(std::size_t operationCount,
       m_counterCount(counterCount + 1),
       m_index(0) {
 
+    m_commonCounts = std::vector<std::uint64_t>(m_operationCount * 2);
     m_eventCounts = std::vector<std::uint64_t>(m_operationCount * m_counterCount);
 }
 
 void
 CounterRecorder::print(std::ostream& oss) const {
-    for (size_t i = 0; i < m_eventCounts.size(); i += m_counterCount) {
-        for (size_t counter = 0; counter < m_counterCount - 1; ++counter) {
-            oss << m_eventCounts[i + counter] << c_csvDelim;
-        }
 
-        oss << m_eventCounts[i + m_counterCount - 1] << std::endl;
+    for (size_t i = 0; i < m_index; i++) {
+        printCommonCounters(oss, i);
+
+        oss << c_csvDelim;
+
+        printEventCounters(oss, i);
+
+        oss << endl;
     }
 }
+
+void
+CounterRecorder::printCommonCounters(std::ostream& oss, std::size_t const measurementIndx) const {
+    std::size_t indx = measurementIndx * c_commonCounterCount;
+
+    oss << m_commonCounts[indx] << c_csvDelim << m_commonCounts[indx + 1];
+}
+
+void 
+CounterRecorder::printEventCounters(std::ostream& oss, std::size_t const measurementIndx) const {
+    std::size_t indx = measurementIndx * m_counterCount;
+
+    for (size_t counter = 0; counter < m_counterCount - 1; ++counter) {
+        oss << m_eventCounts[indx + counter] << c_csvDelim;
+    }
+
+    oss << m_eventCounts[indx + m_counterCount - 1];
+}
+
+
+

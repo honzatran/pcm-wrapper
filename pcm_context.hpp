@@ -13,7 +13,7 @@
 #include <pcm/cpucounters.h>
 
 constexpr char c_csvDelim = ',';
-
+constexpr char c_commonCounterHeaders[] = "INSTRUCTIONS,CYCLES";
 
 namespace PcmWrapper {
 
@@ -29,6 +29,15 @@ public:
     std::uint64_t getEventCounts() const {
         return getNumberOfCustomEvents(order, m_startState, m_endState);
     }
+
+    std::uint64_t getExecutedInstructions() const {
+        return getInstructionsRetired(m_startState, m_endState);
+    }
+
+    std::uint64_t getExecutedCycles() const {
+        return getCycles(m_startState, m_endState);
+    }
+
 protected:
     CounterState(PCM* pcm) : m_pcm(pcm) {}
     STATE m_startState;
@@ -48,8 +57,10 @@ inline std::ostream&
 operator<<(std::ostream& oss, EventHeader const& eventHeader) {
     auto &eventsName = eventHeader.chosenEvents;
 
-    return oss << eventsName[0] << "," << eventsName[1] << "," << eventsName[2]
-               << "," << eventsName[3];
+    oss << c_commonCounterHeaders << c_csvDelim;
+
+    return oss << eventsName[0] << c_csvDelim << eventsName[1] << c_csvDelim
+               << eventsName[2] << c_csvDelim << eventsName[3];
 }
 
 
@@ -137,7 +148,9 @@ public:
         storeCounterDifference<COUNTER_STATE, CounterRegister::THREE>(state);
         storeCounterDifference<COUNTER_STATE, CounterRegister::FOUR>(state);
 
-        m_index += m_counterCount;
+        storeCommonCounters(state);
+
+        m_index += 1;
     }
 
     friend std::ostream& operator<<(std::ostream& oss,
@@ -145,26 +158,52 @@ public:
 
     void reset() { m_index = 0; }
 private:
+    static constexpr std::size_t c_commonCounterCount = 2;
+
+
     std::size_t const m_operationCount;
     std::size_t const m_counterCount;
+
+    // user common counters, instruction and cycles
+    std::vector<std::uint64_t> m_commonCounts;
+    // user defined counters
     std::vector<std::uint64_t> m_eventCounts;
+
 
     std::size_t m_index;
 
     template <typename COUNTER_STATE, CounterRegister COUNTER_REGISTER>
     void storeCounterDifference(COUNTER_STATE const& state) {
         if (COUNTER_REGISTER < m_counterCount) {
-            if (m_index + COUNTER_REGISTER < m_eventCounts.size()) {
-                m_eventCounts[m_index + COUNTER_REGISTER] =
+            std::size_t const indx = m_index * m_counterCount;
+
+            if (indx + COUNTER_REGISTER < m_eventCounts.size()) {
+                m_eventCounts[indx + COUNTER_REGISTER] =
                     state.template getEventCounts<COUNTER_REGISTER>();
             } else {
                 FATAL_ERROR(
-                    "Storing event count outside the eventCount structure");
+                    "Storing event count outside the eventCounts structure");
             }
         } 
     }
 
+    template <typename COUNTER_STATE>
+    void storeCommonCounters(COUNTER_STATE const& state) {
+        std::size_t const indx = m_index * c_commonCounterCount;
+
+        if (m_index + 1 < m_commonCounts.size()) {
+            m_commonCounts[indx]     = state.getExecutedInstructions();
+            m_commonCounts[indx + 1] = state.getExecutedCycles();
+        } else {
+            FATAL_ERROR("Storing common event outside commonCounts structure");
+        }
+    }
+
     void print(std::ostream& oss) const;
+
+    void printCommonCounters(std::ostream& oss, std::size_t const measurementIndx) const;
+
+    void printEventCounters(std::ostream& oss, std::size_t const measurementIndx) const;
 };
 
 inline std::ostream&
