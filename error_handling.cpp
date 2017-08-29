@@ -16,8 +16,6 @@ void defaultFatalHandler(char const* errorMsg) {
 
 std::function<void(char const*)> g_fatalErrorHandler = defaultFatalHandler;
 
-std::vector<std::function<void()>> g_onFatalErrors;
-
 void
 detailedDefaultFatalHandler(char const* errorMsg,
                             char const* file,
