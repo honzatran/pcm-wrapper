@@ -32,6 +32,7 @@ const std::unordered_map<string, PCM::SupportedCPUModels> c_cpuModels = {
     {"ivybridge", PCM::IVY_BRIDGE},
     {"ivytown", PCM::IVYTOWN},
     {"skylake", PCM::SKL},
+    {"skylakex", PCM::SKX}
 };
 
 bool
