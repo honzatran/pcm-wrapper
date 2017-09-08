@@ -13,6 +13,9 @@
 #include <dirent.h>
 #include <unordered_map>
 
+#include <pcm/types.h>
+#include <pcm/cpucounters.h>
+
 using json = nlohmann::json;
 
 using namespace std;

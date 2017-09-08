@@ -7,10 +7,6 @@
 #include <algorithm>
 #include <type_traits>
 
-
-#include <pcm/types.h>
-#include <pcm/cpucounters.h>
-
 namespace PcmWrapper {
 
 class HwCounter;

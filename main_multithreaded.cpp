@@ -12,6 +12,12 @@
 
 #include <mutex>
 
+#ifdef __linux__
+
+#include <sched.h>
+
+#endif
+
 std::mutex mtx;
 
 
@@ -21,12 +27,42 @@ using namespace PcmWrapper;
 #define SIZE 1024 * 1024 * 512 
 #define MAX 1024
 
+class AffinityGuard
+{
+public:
+#ifdef __linux__
+    cpu_set_t oldstate;
+
+    explicit AffinityGuard(std::uint32_t core) {
+        pthread_getaffinity_np(
+            std::this_thread::get_id(), sizeof(cpu_set_t), &oldstate);
+
+        cpu_set_t newstate;
+        CPU_ZERO(&newstate);
+        CPU_SET(core, &newstate);
+
+        pthread_setaffinity_np(
+            std::this_thread::get_id(), sizeof(cpu_set_t), &newstate);
+    }
+
+    ~AffinityGuard() {
+        pthread_setaffinity_np(
+            std::this_thread::get_id(), sizeof(cpu_set_t), &oldstate);
+    }
+#else
+
+    explicit AffinityGuard(std::uint32_t core) {}
+#endif
+};
+
 void
 work(PcmContext const& context, int core) {
     std::mt19937 gen;
     uniform_int_distribution<int> dist(0, MAX);
 
     uniform_int_distribution<int> index_dist(1, SIZE);
+
+    AffinityGuard affinityGuard(core);
 
     auto handle = context.getCoreHandle(core);
 
