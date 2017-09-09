@@ -47,6 +47,7 @@ protected:
 };
 }
 
+class RDPMCCountersHandle;
 class CoreCountersHandle;
 class SystemCountersHandle;
 
@@ -211,6 +212,36 @@ operator<<(std::ostream& oss, CounterRecorder const& recorder) {
     recorder.print(oss);
     return oss;
 }
+
+class RDPMCCountersHandle
+{
+public:
+    void onStart();
+    void onEnd();
+
+    template <CounterRegister order>
+    std::uint64_t getEventCounts() const {
+        return 0;
+    }
+
+    std::uint64_t getExecutedInstructions() const {
+        return m_endState.instructions - m_startState.instructions;
+    }
+
+    std::uint64_t getExecutedCycles() const {
+        return m_endState.cycles - m_startState.cycles;
+    }
+private:
+    struct CounterState
+    {
+        std::uint64_t instructions;
+        std::uint64_t cycles;
+
+        std::uint64_t p[4];
+    };
+
+    CounterState m_startState, m_endState;
+};
 
 template <typename T>
 class CounterHandleRecorder : public T, public CounterRecorder
