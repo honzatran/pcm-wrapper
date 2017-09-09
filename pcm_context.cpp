@@ -36,9 +36,9 @@ PcmContext::init(HwCounterJsonReader const& reader) {
         m_counters[counter.getIdentifier()] = counter;
     }
 
-    setCounter<CounterRegister::ONE>("MEM_LOAD_UOPS_RETIRED.L1_MISS");
-    setCounter<CounterRegister::TWO>("MEM_LOAD_UOPS_RETIRED.L2_MISS");
-    setCounter<CounterRegister::THREE>("MEM_LOAD_UOPS_RETIRED.L3_MISS");
+    setCounter<CounterRegister::ONE>("MEM_LOAD_RETIRED.L1_MISS");
+    setCounter<CounterRegister::TWO>("MEM_LOAD_RETIRED.L2_MISS");
+    setCounter<CounterRegister::THREE>("MEM_LOAD_RETIRED.L3_MISS");
     setCounter<CounterRegister::FOUR>("DTLB_LOAD_MISSES.WALK_COMPLETED");
 }
 

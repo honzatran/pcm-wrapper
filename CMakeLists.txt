@@ -3,6 +3,7 @@ project(BENCH)
 cmake_minimum_required(VERSION 3.0.2)
 
 set(PCM_WRAPPER "pcm-wrapper")
+set(CMAKE_CXX_FLAGS "-std=c++11 -fno-omit-frame-pointer")
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/cmake)
 

@@ -35,19 +35,19 @@ public:
 
     explicit AffinityGuard(std::uint32_t core) {
         pthread_getaffinity_np(
-            std::this_thread::get_id(), sizeof(cpu_set_t), &oldstate);
+            pthread_self(), sizeof(cpu_set_t), &oldstate);
 
         cpu_set_t newstate;
         CPU_ZERO(&newstate);
         CPU_SET(core, &newstate);
 
         pthread_setaffinity_np(
-            std::this_thread::get_id(), sizeof(cpu_set_t), &newstate);
+            pthread_self(), sizeof(cpu_set_t), &newstate);
     }
 
     ~AffinityGuard() {
         pthread_setaffinity_np(
-            std::this_thread::get_id(), sizeof(cpu_set_t), &oldstate);
+            pthread_self(), sizeof(cpu_set_t), &oldstate);
     }
 #else
 
@@ -68,34 +68,39 @@ work(PcmContext const& context, int core) {
 
     auto mixin =
         PcmWrapper::CounterHandleRecorder<std::decay<decltype(handle)>::type>(
-            2, PcmWrapper::FOUR, std::move(handle));
+            1000, PcmWrapper::FOUR, std::move(handle));
 
-    std::vector<int> values;
-    values.reserve(SIZE);
-
-    for (std::size_t i = 0; i < SIZE; i++) {
-        values.push_back(dist(gen));
+    for (int i = 0; i < 1000; ++i) {
+        mixin.onStart();
+        mixin.onEnd();
     }
 
-    int sum = 0;
+    // std::vector<int> values;
+    // values.reserve(SIZE);
+    //
+    // for (std::size_t i = 0; i < SIZE; i++) {
+    //     values.push_back(dist(gen));
+    // }
+    //
+    // int sum = 0;
+    //
+    // mixin.onStart();
+    // for (std::size_t i = 0; i < 100; i++) {
+    //     sum += values[i];
+    // }
+    // mixin.onEnd();
 
-    mixin.onStart();
-    for (std::size_t i = 0; i < 100; i++) {
-        sum += values[i];
-    }
-    mixin.onEnd();
+    // vector<int> indices;
+    // indices.reserve(1000000);
+    // for (std::size_t i = 0; i < SIZE; i++) {
+    //     indices.push_back(dist(gen));
+    // }
 
-    vector<int> indices;
-    indices.reserve(1000000);
-    for (std::size_t i = 0; i < SIZE; i++) {
-        indices.push_back(dist(gen));
-    }
-
-    mixin.onStart();
-    for (std::size_t i = 0; i < 100; i++) {
-        sum += values[indices[i]];
-    }
-    mixin.onEnd();
+    // mixin.onStart();
+    // for (std::size_t i = 0; i < 100; i++) {
+    //     sum += values[indices[i]];
+    // }
+    // mixin.onEnd();
 
     {
         std::lock_guard<std::mutex> lock_guard(mutex);
@@ -121,9 +126,13 @@ main(int argc, char** argv) {
 
     set_signal_handlers();
 
+#if PCM_USE_PERF
+    cout << "USING PERF" << endl;
+#endif
+
     std::vector<std::thread> workers;
 
-    for (size_t i = 0; i < 4; ++i) {
+    for (size_t i = 4; i < 9; ++i) {
         workers.push_back(std::thread([i, &context] { work(context, i); }));
     }
 
