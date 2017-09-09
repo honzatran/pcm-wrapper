@@ -221,7 +221,7 @@ public:
 
     template <CounterRegister order>
     std::uint64_t getEventCounts() const {
-        return 0;
+        return m_endState.p[order] - m_startState.p[order];
     }
 
     std::uint64_t getExecutedInstructions() const {
