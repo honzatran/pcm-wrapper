@@ -167,5 +167,29 @@ CounterRecorder::printEventCounters(std::ostream& oss, std::size_t const measure
     oss << m_eventCounts[indx + m_counterCount - 1];
 }
 
+std::uint64_t getExecutedInstructions() {
+    unsigned c = (1 << 30);
+    unsigned a, d;
+    __asm__ volatile("rdpmc" : "=a" (a), "=d" (d): "c" (c));
+    return ((std::uint64_t) a) | (((std::uint64_t) d) << 32);
+}
 
+std::uint64_t getExecutedCycles() {
+    unsigned c = (1 << 30) + 1;
+    unsigned a, d;
+    __asm__ volatile("rdpmc" : "=a" (a), "=d" (d): "c" (c));
+    return ((std::uint64_t) a) | (((std::uint64_t) d) << 32);
+}
+
+void
+RDPMCCountersHandle::onStart() {
+    m_startState.instructions = getExecutedInstructions();
+    m_startState.cycles = getExecutedCycles();
+}
+
+void
+RDPMCCountersHandle::onEnd() {
+    m_endState.instructions = getExecutedInstructions();
+    m_endState.cycles = getExecutedCycles();
+}
 
