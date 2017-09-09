@@ -167,29 +167,46 @@ CounterRecorder::printEventCounters(std::ostream& oss, std::size_t const measure
     oss << m_eventCounts[indx + m_counterCount - 1];
 }
 
-std::uint64_t getExecutedInstructions() {
+std::uint64_t getExecutedInstructionsRDPMC() {
     unsigned c = (1 << 30);
     unsigned a, d;
-    __asm__ volatile("rdpmc" : "=a" (a), "=d" (d): "c" (c));
+    __asm__ __volatile__("rdpmc" : "=a" (a), "=d" (d): "c" (c));
+
     return ((std::uint64_t) a) | (((std::uint64_t) d) << 32);
 }
 
-std::uint64_t getExecutedCycles() {
+std::uint64_t getExecutedCyclesRDPMC() {
     unsigned c = (1 << 30) + 1;
     unsigned a, d;
-    __asm__ volatile("rdpmc" : "=a" (a), "=d" (d): "c" (c));
+    __asm__ __volatile__("rdpmc" : "=a" (a), "=d" (d): "c" (c));
+
     return ((std::uint64_t) a) | (((std::uint64_t) d) << 32);
+}
+
+void 
+__cpuid() {
+    unsigned a, b, c, d;
+
+    __asm__ __volatile__("cpuid" : "=a" (a), "=b" (b), "=c" (c), "=d" (d));
 }
 
 void
 RDPMCCountersHandle::onStart() {
-    m_startState.instructions = getExecutedInstructions();
-    m_startState.cycles = getExecutedCycles();
+    // __cpuid();
+    m_startState.instructions = getExecutedInstructionsRDPMC();
+    m_startState.cycles = getExecutedCyclesRDPMC();
+    // __cpuid();
 }
 
 void
 RDPMCCountersHandle::onEnd() {
-    m_endState.instructions = getExecutedInstructions();
-    m_endState.cycles = getExecutedCycles();
+    // __cpuid();
+    m_endState.instructions = getExecutedInstructionsRDPMC();
+    m_endState.cycles = getExecutedCyclesRDPMC();
+    // __cpuid();
 }
+
+
+
+
 
