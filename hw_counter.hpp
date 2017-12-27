@@ -6,8 +6,9 @@
 #include <mutex>
 #include <string>
 #include <type_traits>
+#include <vector>
 
-namespace PcmWrapper
+namespace pcm_wrapper
 {
 class HwCounter;
 

@@ -9,6 +9,7 @@
 #include "hw_counter.hpp"
 #include "hw_counter_json_reader.hpp"
 #include "pcm_context.hpp"
+#include "rdmpc_counter_handle.hpp"
 
 #include <mutex>
 
@@ -21,7 +22,7 @@
 std::mutex mtx;
 
 using namespace std;
-using namespace PcmWrapper;
+using namespace pcm_wrapper;
 
 #define SIZE 1024 * 1024 * 512
 #define MAX 1024
@@ -66,8 +67,8 @@ work(PcmContext const& context, int core)
     auto handle = context.getCoreHandle(core);
 
     auto mixin
-        = PcmWrapper::CounterHandleRecorder<std::decay<decltype(handle)>::type>(
-            1000, PcmWrapper::FOUR, std::move(handle));
+        = pcm_wrapper::CounterHandleRecorder<std::decay<decltype(handle)>::type>(
+            1000, pcm_wrapper::FOUR, std::move(handle));
 
     for (int i = 0; i < 1000; ++i)
     {
@@ -114,11 +115,11 @@ work(PcmContext const& context, int core)
 int
 main(int argc, char** argv)
 {
-    PcmWrapper::HwCounterJsonReader reader;
+    pcm_wrapper::HwCounterJsonReader reader;
 
     reader.loadFromDirectory(argv[1]);
 
-    PcmWrapper::PcmContext context;
+    pcm_wrapper::PcmContext context;
     context.init(reader);
     context.resetMsrIfBusy();
 

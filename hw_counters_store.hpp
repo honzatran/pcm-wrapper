@@ -29,7 +29,7 @@ public:
 
     std::uint64_t operator[](std::size_t index) const;
 
-    std::size_t size() const { return m_index; }
+    // std::size_t size() const { return m_index; }
 private:
     std::shared_ptr<HwCounterStore> m_store;
 };

@@ -28,11 +28,11 @@ main(int argc, char **argv)
 
     ASSERT(argc == 2, "AA");
 
-    PcmWrapper::HwCounterJsonReader reader;
+    pcm_wrapper::HwCounterJsonReader reader;
 
     reader.loadFromDirectory(argv[1]);
 
-    PcmWrapper::PcmContext context;
+    pcm_wrapper::PcmContext context;
     context.init(reader);
     context.resetMsrIfBusy();
 
@@ -40,9 +40,8 @@ main(int argc, char **argv)
 
     auto handle = context.getCoreHandle(2);
 
-    auto mixin
-        = PcmWrapper::CounterHandleRecorder<std::decay<decltype(handle)>::type>(
-            2, PcmWrapper::FOUR, std::move(handle));
+    auto mixin = pcm_wrapper::CounterHandleRecorder<std::decay<decltype(
+        handle)>::type>(2, pcm_wrapper::FOUR, std::move(handle));
 
     set_signal_handlers();
 

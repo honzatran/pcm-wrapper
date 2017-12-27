@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include "hw_counter.hpp"
 
-namespace PcmWrapper
+namespace pcm_wrapper
 {
 class HwCounterJsonReader
 {
@@ -16,10 +16,10 @@ public:
 
     void loadFromDirectory(std::string const& directory);
 
-    std::vector<PcmWrapper::HwCounter> getCounters(int cpuModel) const;
+    std::vector<pcm_wrapper::HwCounter> getCounters(int cpuModel) const;
 
 private:
-    std::unordered_map<std::string, PcmWrapper::HwCounter> m_hwCounters;
+    std::unordered_map<std::string, pcm_wrapper::HwCounter> m_hwCounters;
 
     HwCounter convert(nlohmann::json const& serializedCounter);
 };

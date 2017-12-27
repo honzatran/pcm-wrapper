@@ -20,7 +20,7 @@ using json = nlohmann::json;
 
 using namespace std;
 
-using namespace PcmWrapper;
+using namespace pcm_wrapper;
 
 constexpr char c_EventName[] = "EventName";
 constexpr char c_EventCode[] = "EventCode";

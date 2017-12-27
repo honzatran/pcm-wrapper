@@ -7,11 +7,8 @@
 
 #include <pcm/cpucounters.h>
 
-using namespace PcmWrapper;
+using namespace pcm_wrapper;
 using namespace std;
-
-constexpr unsigned RETIRED_INSTRUCTION = 1 << 30;
-constexpr unsigned EXECUTED_CYCLES     = RETIRED_INSTRUCTION + 1;
 
 std::pair<std::string, HwCounter>
 toCounterPair(HwCounter const& counter)
@@ -204,63 +201,10 @@ CounterRecorder::printEventCounters(
     oss << m_eventCounts[indx + m_counterCount - 1];
 }
 
-template <unsigned COUNTER>
-std::uint64_t
-RDPMC()
-{
-    unsigned a, d;
-    __asm__ __volatile__("rdpmc" : "=a"(a), "=d"(d) : "c"(COUNTER));
-    return ((std::uint64_t)a) | (((std::uint64_t)d) << 32);
-}
-
-std::uint64_t
-getExecutedInstructionsRDPMC()
-{
-    unsigned c = (1 << 30);
-    unsigned a, d;
-    __asm__ __volatile__("rdpmc" : "=a"(a), "=d"(d) : "c"(c));
-
-    return ((std::uint64_t)a) | (((std::uint64_t)d) << 32);
-}
-
-std::uint64_t
-getExecutedCyclesRDPMC()
-{
-    unsigned c = (1 << 30) + 1;
-    unsigned a, d;
-    __asm__ __volatile__("rdpmc" : "=a"(a), "=d"(d) : "c"(c));
-
-    return ((std::uint64_t)a) | (((std::uint64_t)d) << 32);
-}
-
 void
 __cpuid()
 {
     unsigned a, b, c, d;
 
     __asm__ __volatile__("cpuid" : "=a"(a), "=b"(b), "=c"(c), "=d"(d));
-}
-
-void
-RDPMCCountersHandle::onStart()
-{
-    m_startState.instructions = RDPMC<RETIRED_INSTRUCTION>();
-    m_startState.cycles       = RDPMC<EXECUTED_CYCLES>();
-
-    m_startState.p[0] = RDPMC<0>();
-    m_startState.p[1] = RDPMC<1>();
-    m_startState.p[2] = RDPMC<2>();
-    m_startState.p[3] = RDPMC<3>();
-}
-
-void
-RDPMCCountersHandle::onEnd()
-{
-    m_endState.instructions = RDPMC<RETIRED_INSTRUCTION>();
-    m_endState.cycles       = RDPMC<EXECUTED_CYCLES>();
-
-    m_endState.p[0] = RDPMC<0>();
-    m_endState.p[1] = RDPMC<1>();
-    m_endState.p[2] = RDPMC<2>();
-    m_endState.p[3] = RDPMC<3>();
 }
