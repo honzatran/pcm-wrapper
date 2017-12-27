@@ -17,6 +17,17 @@ void defaultFatalHandler(char const* errorMsg) {
 std::function<void(char const*)> g_fatalErrorHandler = defaultFatalHandler;
 
 void
+resetDefaultErrorHandler()
+{
+    g_fatalErrorHandler = defaultFatalHandler;
+}
+
+void
+setDefaultErrorHandler(std::function<void(char const*)> const& handler) {
+    g_fatalErrorHandler = handler;
+}
+
+void
 detailedDefaultFatalHandler(char const* errorMsg,
                             char const* file,
                             int const line) {
