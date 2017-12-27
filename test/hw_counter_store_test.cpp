@@ -2,17 +2,20 @@
 
 #include <catch.hpp>
 
-#include "../hw_counters_store.hpp"
 #include "../error_handling.hpp"
+#include "../hw_counters_store.hpp"
 
-TEST_CASE("HW_COUNTER_STORE", "[HW_COUNTER_STORE]") {
+TEST_CASE("HW_COUNTER_STORE", "[HW_COUNTER_STORE]")
+{
     HwCounterStore store(5);
 
-    for (std::size_t i = 0; i < 5; i++) {
+    for (std::size_t i = 0; i < 5; i++)
+    {
         store.append(i);
     }
 
-    SECTION("CONTENT") {
+    SECTION("CONTENT")
+    {
         REQUIRE(0 == store[0]);
         REQUIRE(1 == store[1]);
         REQUIRE(2 == store[2]);
@@ -20,7 +23,8 @@ TEST_CASE("HW_COUNTER_STORE", "[HW_COUNTER_STORE]") {
         REQUIRE(4 == store[4]);
     }
 
-    SECTION("OVERFLOW") {
+    SECTION("OVERFLOW")
+    {
         bool b = false;
         setDefaultErrorHandler([&b](char const* msg) { b = true; });
         store.append(5);
@@ -31,4 +35,3 @@ TEST_CASE("HW_COUNTER_STORE", "[HW_COUNTER_STORE]") {
 
     SECTION("SIZE") { REQUIRE(5 == store.size()); }
 }
-

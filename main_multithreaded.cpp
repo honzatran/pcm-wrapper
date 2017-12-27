@@ -1,7 +1,7 @@
-#include <vector>
-#include <random>
 #include <chrono>
+#include <random>
 #include <thread>
+#include <vector>
 
 #include <pcm/cpucounters.h>
 #include <pcm/utils.h>
@@ -20,11 +20,10 @@
 
 std::mutex mtx;
 
-
 using namespace std;
 using namespace PcmWrapper;
 
-#define SIZE 1024 * 1024 * 512 
+#define SIZE 1024 * 1024 * 512
 #define MAX 1024
 
 class AffinityGuard
@@ -33,21 +32,20 @@ public:
 #ifdef __linux__
     cpu_set_t oldstate;
 
-    explicit AffinityGuard(std::uint32_t core) {
-        pthread_getaffinity_np(
-            pthread_self(), sizeof(cpu_set_t), &oldstate);
+    explicit AffinityGuard(std::uint32_t core)
+    {
+        pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t), &oldstate);
 
         cpu_set_t newstate;
         CPU_ZERO(&newstate);
         CPU_SET(core, &newstate);
 
-        pthread_setaffinity_np(
-            pthread_self(), sizeof(cpu_set_t), &newstate);
+        pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &newstate);
     }
 
-    ~AffinityGuard() {
-        pthread_setaffinity_np(
-            pthread_self(), sizeof(cpu_set_t), &oldstate);
+    ~AffinityGuard()
+    {
+        pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &oldstate);
     }
 #else
 
@@ -56,7 +54,8 @@ public:
 };
 
 void
-work(PcmContext const& context, int core) {
+work(PcmContext const& context, int core)
+{
     std::mt19937 gen;
     uniform_int_distribution<int> dist(0, MAX);
 
@@ -66,11 +65,12 @@ work(PcmContext const& context, int core) {
 
     auto handle = context.getCoreHandle(core);
 
-    auto mixin =
-        PcmWrapper::CounterHandleRecorder<std::decay<decltype(handle)>::type>(
+    auto mixin
+        = PcmWrapper::CounterHandleRecorder<std::decay<decltype(handle)>::type>(
             1000, PcmWrapper::FOUR, std::move(handle));
 
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 1000; ++i)
+    {
         mixin.onStart();
         mixin.onEnd();
     }
@@ -112,8 +112,8 @@ work(PcmContext const& context, int core) {
 }
 
 int
-main(int argc, char** argv) {
-
+main(int argc, char** argv)
+{
     PcmWrapper::HwCounterJsonReader reader;
 
     reader.loadFromDirectory(argv[1]);
@@ -132,11 +132,13 @@ main(int argc, char** argv) {
 
     std::vector<std::thread> workers;
 
-    for (size_t i = 4; i < 9; ++i) {
+    for (size_t i = 4; i < 9; ++i)
+    {
         workers.push_back(std::thread([i, &context] { work(context, i); }));
     }
 
-    for (auto & t : workers) {
+    for (auto& t : workers)
+    {
         t.join();
     }
 

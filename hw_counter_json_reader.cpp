@@ -13,8 +13,8 @@
 #include <dirent.h>
 #include <unordered_map>
 
-#include <pcm/types.h>
 #include <pcm/cpucounters.h>
+#include <pcm/types.h>
 
 using json = nlohmann::json;
 
@@ -26,33 +26,32 @@ constexpr char c_EventName[] = "EventName";
 constexpr char c_EventCode[] = "EventCode";
 constexpr char c_UMask[]     = "UMask";
 
-const std::unordered_map<string, PCM::SupportedCPUModels> c_cpuModels = {
-    {"broadwell", PCM::BROADWELL},
-    {"broadwellde", PCM::BDX_DE},
-    {"broadwellx", PCM::BDX},
-    {"haswell", PCM::HASWELL},
-    {"haswellx", PCM::HASWELLX},
-    {"ivybridge", PCM::IVY_BRIDGE},
-    {"ivytown", PCM::IVYTOWN},
-    {"skylake", PCM::SKL},
-    {"skylakex", PCM::SKX}
-};
+const std::unordered_map<string, PCM::SupportedCPUModels> c_cpuModels
+    = {{"broadwell", PCM::BROADWELL}, {"broadwellde", PCM::BDX_DE},
+       {"broadwellx", PCM::BDX},      {"haswell", PCM::HASWELL},
+       {"haswellx", PCM::HASWELLX},   {"ivybridge", PCM::IVY_BRIDGE},
+       {"ivytown", PCM::IVYTOWN},     {"skylake", PCM::SKL},
+       {"skylakex", PCM::SKX}};
 
 bool
-isFile(dirent* const ent) {
+isFile(dirent* const ent)
+{
     return ent->d_type == DT_REG;
 }
 
 bool
-isJson(string const& filename) {
+isJson(string const& filename)
+{
     return filename.substr(filename.size() - 4) == "json";
 }
 
 void
-HwCounterJsonReader::loadCounters(std::string const& filePath, int cpuModel) {
+HwCounterJsonReader::loadCounters(std::string const& filePath, int cpuModel)
+{
     std::ifstream inputStream(filePath);
 
-    if (!inputStream.is_open()) {
+    if (!inputStream.is_open())
+    {
         std::string s = "Could not open file " + filePath;
         FATAL_ERROR(s.c_str());
     }
@@ -61,15 +60,19 @@ HwCounterJsonReader::loadCounters(std::string const& filePath, int cpuModel) {
 
     inputStream >> j;
 
-    for (auto const& element : j) {
+    for (auto const& element : j)
+    {
         HwCounter counter = convert(element);
 
         auto counterIt = m_hwCounters.find(counter.getIdentifier());
 
-        if (counterIt == m_hwCounters.end()) {
+        if (counterIt == m_hwCounters.end())
+        {
             counter.addSupportedCpuModel(cpuModel);
             m_hwCounters.insert({counter.getIdentifier(), counter});
-        } else {
+        }
+        else
+        {
             counterIt->second.addSupportedCpuModel(cpuModel);
         }
     }
@@ -77,24 +80,31 @@ HwCounterJsonReader::loadCounters(std::string const& filePath, int cpuModel) {
 
 template <typename F>
 void
-processFile(string const& directory, dirent* const ent, F&& f) {
+processFile(string const& directory, dirent* const ent, F&& f)
+{
     string filename = ent->d_name;
 
-    if (isJson(filename)) {
+    if (isJson(filename))
+    {
         f(filename);
     }
 }
 
 int
-getCPUModel(std::string const& filename) {
+getCPUModel(std::string const& filename)
+{
     int pos = filename.find('_');
 
-    if (pos == string::npos) {
+    if (pos == string::npos)
+    {
         return -1;
-    } else {
+    }
+    else
+    {
         auto it = c_cpuModels.find(filename.substr(0, pos));
 
-        if (it != c_cpuModels.end()) {
+        if (it != c_cpuModels.end())
+        {
             return it->second;
         }
 
@@ -103,7 +113,8 @@ getCPUModel(std::string const& filename) {
 }
 
 void
-HwCounterJsonReader::loadFromDirectory(std::string const& directory) {
+HwCounterJsonReader::loadFromDirectory(std::string const& directory)
+{
     DIR* dir;
     dirent* ent;
 
@@ -111,15 +122,19 @@ HwCounterJsonReader::loadFromDirectory(std::string const& directory) {
     auto loadCounterFunctor = [this, &directory](std::string const& filename) {
         int cpuModel = getCPUModel(filename);
 
-        if (cpuModel >= 0) {
+        if (cpuModel >= 0)
+        {
             string fullpath = directory + "/" + filename;
             loadCounters(fullpath, getCPUModel(filename));
         }
     };
 
-    if ((dir = opendir(directory.c_str())) != nullptr) {
-        while ((ent = readdir(dir)) != nullptr) {
-            if (isFile(ent)) {
+    if ((dir = opendir(directory.c_str())) != nullptr)
+    {
+        while ((ent = readdir(dir)) != nullptr)
+        {
+            if (isFile(ent))
+            {
                 processFile(directory, ent, loadCounterFunctor);
             }
         }
@@ -129,7 +144,8 @@ HwCounterJsonReader::loadFromDirectory(std::string const& directory) {
 }
 
 HwCounter
-HwCounterJsonReader::convert(nlohmann::json const& serializedCounter) {
+HwCounterJsonReader::convert(nlohmann::json const& serializedCounter)
+{
     const std::string hexaEventMask = serializedCounter[c_EventCode];
     const std::string hexaUMask     = serializedCounter[c_UMask];
     const std::string hwCounterName = serializedCounter[c_EventName];
@@ -141,17 +157,19 @@ HwCounterJsonReader::convert(nlohmann::json const& serializedCounter) {
 }
 
 std::vector<HwCounter>
-HwCounterJsonReader::getCounters(int cpuModel) const {
+HwCounterJsonReader::getCounters(int cpuModel) const
+{
     std::vector<HwCounter> counters;
-    for (const auto& p : m_hwCounters) {
+    for (const auto& p : m_hwCounters)
+    {
         auto& cpumodels = p.second.getSupportedModels();
 
         bool supports = p.second.supports(cpuModel);
 
-        if (supports) {
+        if (supports)
+        {
             counters.push_back(p.second);
         }
     }
     return counters;
 }
-
