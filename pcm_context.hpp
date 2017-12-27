@@ -2,8 +2,8 @@
 #define PCM_CONTEXT_HPP
 
 #include "error_handling.hpp"
-#include "hw_event.hpp"
 #include "hw_counter_json_reader.hpp"
+#include "hw_event.hpp"
 
 #include <array>
 #include <cstdint>
@@ -168,7 +168,8 @@ public:
     }
 
     friend std::ostream& operator<<(
-        std::ostream& oss, CounterRecorder const& recorder);
+        std::ostream& oss,
+        CounterRecorder const& recorder);
 
     void reset() { m_index = 0; }
 private:
@@ -223,10 +224,12 @@ private:
     void print(std::ostream& oss) const;
 
     void printCommonCounters(
-        std::ostream& oss, std::size_t const measurementIndx) const;
+        std::ostream& oss,
+        std::size_t const measurementIndx) const;
 
     void printEventCounters(
-        std::ostream& oss, std::size_t const measurementIndx) const;
+        std::ostream& oss,
+        std::size_t const measurementIndx) const;
 };
 
 inline std::ostream&
@@ -242,7 +245,8 @@ class CounterHandleRecorder : public T, public CounterRecorder
 public:
     template <typename... ARGS>
     CounterHandleRecorder(
-        std::size_t operationCount, CounterRegister counterCount,
+        std::size_t operationCount,
+        CounterRegister counterCount,
         ARGS&&... args)
         : T(std::forward<ARGS>(args)...),
           CounterRecorder(operationCount, counterCount)

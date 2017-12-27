@@ -6,8 +6,8 @@
 #include <pcm/cpucounters.h>
 #include <pcm/utils.h>
 
-#include "hw_event.hpp"
 #include "hw_counter_json_reader.hpp"
+#include "hw_event.hpp"
 #include "pcm_context.hpp"
 #include "rdmpc_counter_handle.hpp"
 
@@ -66,9 +66,8 @@ work(PcmContext const& context, int core)
 
     auto handle = context.getCoreHandle(core);
 
-    auto mixin
-        = pcm_wrapper::CounterHandleRecorder<std::decay<decltype(handle)>::type>(
-            1000, pcm_wrapper::FOUR, std::move(handle));
+    auto mixin = pcm_wrapper::CounterHandleRecorder<std::decay<decltype(
+        handle)>::type>(1000, pcm_wrapper::FOUR, std::move(handle));
 
     for (int i = 0; i < 1000; ++i)
     {

@@ -31,7 +31,6 @@ getExecutedCycles()
 {
     return RDPMC<EXECUTED_CYCLES>();
 }
-
 }
 
 class RDPMCCountersHandle

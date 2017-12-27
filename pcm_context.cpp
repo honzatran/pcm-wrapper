@@ -153,7 +153,8 @@ SystemCountersHandle::onEnd()
 }
 
 CounterRecorder::CounterRecorder(
-    std::size_t operationCount, CounterRegister counterCount)
+    std::size_t operationCount,
+    CounterRegister counterCount)
     : m_operationCount(operationCount),
       m_counterCount(counterCount + 1),
       m_index(0)
@@ -180,7 +181,8 @@ CounterRecorder::print(std::ostream& oss) const
 
 void
 CounterRecorder::printCommonCounters(
-    std::ostream& oss, std::size_t const measurementIndx) const
+    std::ostream& oss,
+    std::size_t const measurementIndx) const
 {
     std::size_t indx = measurementIndx * c_commonCounterCount;
 
@@ -189,7 +191,8 @@ CounterRecorder::printCommonCounters(
 
 void
 CounterRecorder::printEventCounters(
-    std::ostream& oss, std::size_t const measurementIndx) const
+    std::ostream& oss,
+    std::size_t const measurementIndx) const
 {
     std::size_t indx = measurementIndx * m_counterCount;
 

@@ -10,15 +10,16 @@
 
 namespace pcm_wrapper
 {
-
 class HwEvent
 {
 public:
     HwEvent() : m_eventNumber(0), m_umaskValue(0), m_name(""){};
 
     HwEvent(
-        std::int32_t eventNumber, std::int32_t umaskValue,
-        std::string const& name, std::vector<int> const& supportedCpuModels)
+        std::int32_t eventNumber,
+        std::int32_t umaskValue,
+        std::string const& name,
+        std::vector<int> const& supportedCpuModels)
         : m_eventNumber(eventNumber),
           m_umaskValue(umaskValue),
           m_name(name),
@@ -42,7 +43,8 @@ public:
     bool supports(int cpuModel) const
     {
         return std::find(
-                   m_supportedCpuModels.begin(), m_supportedCpuModels.end(),
+                   m_supportedCpuModels.begin(),
+                   m_supportedCpuModels.end(),
                    cpuModel)
                != m_supportedCpuModels.end();
     }

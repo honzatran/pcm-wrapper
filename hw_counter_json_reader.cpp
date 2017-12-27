@@ -27,10 +27,14 @@ constexpr char c_EventCode[] = "EventCode";
 constexpr char c_UMask[]     = "UMask";
 
 const std::unordered_map<string, PCM::SupportedCPUModels> c_cpuModels
-    = {{"broadwell", PCM::BROADWELL}, {"broadwellde", PCM::BDX_DE},
-       {"broadwellx", PCM::BDX},      {"haswell", PCM::HASWELL},
-       {"haswellx", PCM::HASWELLX},   {"ivybridge", PCM::IVY_BRIDGE},
-       {"ivytown", PCM::IVYTOWN},     {"skylake", PCM::SKL},
+    = {{"broadwell", PCM::BROADWELL},
+       {"broadwellde", PCM::BDX_DE},
+       {"broadwellx", PCM::BDX},
+       {"haswell", PCM::HASWELL},
+       {"haswellx", PCM::HASWELLX},
+       {"ivybridge", PCM::IVY_BRIDGE},
+       {"ivytown", PCM::IVYTOWN},
+       {"skylake", PCM::SKL},
        {"skylakex", PCM::SKX}};
 
 bool

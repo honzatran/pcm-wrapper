@@ -6,8 +6,8 @@
 #include <pcm/cpucounters.h>
 #include <pcm/utils.h>
 
-#include "hw_event.hpp"
 #include "hw_counter_json_reader.hpp"
+#include "hw_event.hpp"
 #include "pcm_context.hpp"
 
 #include <mutex>

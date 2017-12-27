@@ -31,7 +31,9 @@ setDefaultErrorHandler(std::function<void(char const*)> const& handler)
 
 void
 detailedDefaultFatalHandler(
-    char const* errorMsg, char const* file, int const line)
+    char const* errorMsg,
+    char const* file,
+    int const line)
 {
     cerr << "fatal error at " << file << ", " << line << ":";
     g_fatalErrorHandler(errorMsg);
