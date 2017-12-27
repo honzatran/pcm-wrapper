@@ -2,6 +2,8 @@
 
 #include "error_handling.hpp"
 
+using namespace pcm_wrapper;
+
 HwCounterStore::HwCounterStore(std::size_t const capacity)
     : m_counters(capacity), m_index(0)
 {

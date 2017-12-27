@@ -10,10 +10,10 @@
 using namespace pcm_wrapper;
 using namespace std;
 
-std::pair<std::string, HwCounter>
-toCounterPair(HwCounter const& counter)
+std::pair<std::string, HwEvent>
+toCounterPair(HwEvent const& event)
 {
-    return std::make_pair(counter.getIdentifier(), counter);
+    return std::make_pair(event.getIdentifier(), event);
 }
 
 PcmContext::~PcmContext()
@@ -54,7 +54,7 @@ PcmContext::startMonitoring()
 
     for (size_t i = 0; i < 4; ++i)
     {
-        HwCounter const& counter = m_counters[m_chosenEvents[i]];
+        auto const& counter = m_counters[m_chosenEvents[i]];
         description[i] = {counter.getEventNumber(), counter.getUMaskValue()};
     }
 

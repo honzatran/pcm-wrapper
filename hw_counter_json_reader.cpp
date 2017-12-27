@@ -1,7 +1,7 @@
 #include "hw_counter_json_reader.hpp"
 
 #include "error_handling.hpp"
-#include "hw_counter.hpp"
+#include "hw_event.hpp"
 
 #include <cstdint>
 #include <fstream>
@@ -62,7 +62,7 @@ HwCounterJsonReader::loadCounters(std::string const& filePath, int cpuModel)
 
     for (auto const& element : j)
     {
-        HwCounter counter = convert(element);
+        HwEvent counter = convert(element);
 
         auto counterIt = m_hwCounters.find(counter.getIdentifier());
 
@@ -143,7 +143,7 @@ HwCounterJsonReader::loadFromDirectory(std::string const& directory)
     }
 }
 
-HwCounter
+HwEvent
 HwCounterJsonReader::convert(nlohmann::json const& serializedCounter)
 {
     const std::string hexaEventMask = serializedCounter[c_EventCode];
@@ -153,13 +153,13 @@ HwCounterJsonReader::convert(nlohmann::json const& serializedCounter)
     const int eventMask = std::stoi(hexaEventMask, 0, 16);
     const int umask     = std::stoi(hexaUMask, 0, 16);
 
-    return HwCounter(eventMask, umask, hwCounterName, {});
+    return HwEvent(eventMask, umask, hwCounterName, {});
 }
 
-std::vector<HwCounter>
+std::vector<HwEvent>
 HwCounterJsonReader::getCounters(int cpuModel) const
 {
-    std::vector<HwCounter> counters;
+    std::vector<HwEvent> counters;
     for (const auto& p : m_hwCounters)
     {
         auto& cpumodels = p.second.getSupportedModels();

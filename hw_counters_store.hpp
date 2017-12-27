@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <vector>
 
+namespace pcm_wrapper
+{
 class HwCounterStore
 {
 public:
@@ -33,5 +35,6 @@ public:
 private:
     std::shared_ptr<HwCounterStore> m_store;
 };
+}
 
 #endif

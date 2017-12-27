@@ -10,14 +10,13 @@
 
 namespace pcm_wrapper
 {
-class HwCounter;
 
-class HwCounter
+class HwEvent
 {
 public:
-    HwCounter() : m_eventNumber(0), m_umaskValue(0), m_name(""){};
+    HwEvent() : m_eventNumber(0), m_umaskValue(0), m_name(""){};
 
-    HwCounter(
+    HwEvent(
         std::int32_t eventNumber, std::int32_t umaskValue,
         std::string const& name, std::vector<int> const& supportedCpuModels)
         : m_eventNumber(eventNumber),

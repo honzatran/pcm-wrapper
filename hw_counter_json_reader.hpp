@@ -5,7 +5,7 @@
 #include <json/json.hpp>
 
 #include <unordered_map>
-#include "hw_counter.hpp"
+#include "hw_event.hpp"
 
 namespace pcm_wrapper
 {
@@ -16,12 +16,12 @@ public:
 
     void loadFromDirectory(std::string const& directory);
 
-    std::vector<pcm_wrapper::HwCounter> getCounters(int cpuModel) const;
+    std::vector<pcm_wrapper::HwEvent> getCounters(int cpuModel) const;
 
 private:
-    std::unordered_map<std::string, pcm_wrapper::HwCounter> m_hwCounters;
+    std::unordered_map<std::string, pcm_wrapper::HwEvent> m_hwCounters;
 
-    HwCounter convert(nlohmann::json const& serializedCounter);
+    HwEvent convert(nlohmann::json const& serializedCounter);
 };
 }
 

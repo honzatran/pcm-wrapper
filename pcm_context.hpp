@@ -2,7 +2,7 @@
 #define PCM_CONTEXT_HPP
 
 #include "error_handling.hpp"
-#include "hw_counter.hpp"
+#include "hw_event.hpp"
 #include "hw_counter_json_reader.hpp"
 
 #include <array>
@@ -108,11 +108,11 @@ public:
     EventHeader getEventHeader() const { return {m_chosenEvents}; }
 private:
     PCM* m_pcm;
-    std::unordered_map<std::string, HwCounter> m_counters;
+    std::unordered_map<std::string, HwEvent> m_counters;
     std::array<std::string, 4> m_chosenEvents;
     bool m_resetBusyDevice = false;
 
-    const HwCounter& getHwCounter(std::string const& eventName) const;
+    const HwEvent& getHwCounter(std::string const& eventName) const;
 
     void handlePcmProgramError(PCM::ErrorCode ec);
 

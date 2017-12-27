@@ -5,6 +5,8 @@
 #include "../error_handling.hpp"
 #include "../hw_counters_store.hpp"
 
+using namespace pcm_wrapper;
+
 TEST_CASE("HW_COUNTER_STORE", "[HW_COUNTER_STORE]")
 {
     HwCounterStore store(5);
