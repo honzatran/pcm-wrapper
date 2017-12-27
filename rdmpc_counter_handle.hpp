@@ -37,6 +37,7 @@ getExecutedCycles()
 class RDPMCCountersHandle
 {
 public:
+#if __linux__
     void onStart()
     {
         m_startState.instructions = detail::getRetiredInstructions();
@@ -85,6 +86,8 @@ private:
     };
 
     CounterState m_startState, m_endState;
+
+#endif
 };
 };
 
